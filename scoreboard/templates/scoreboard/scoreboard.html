@@ -1,0 +1,389 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familiada</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold-color: #ffcc44;
+            --bg-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--gold-color);
+            font-family: 'Press Start 2P', monospace;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hidden-audio-player {
+            display: none;
+        }
+
+        .pointsboard-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4vh 4vw;
+        }
+
+        /* Top big numbers "00" */
+        .header-points {
+            font-size: 11vh; 
+            margin-top: 2vh;
+            letter-spacing: 1vw;
+            line-height: 1;
+        }
+
+        /* Main center layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            width: 100%;
+            max-width: 95vw;
+            align-items: center;
+            gap: 4vw;
+            flex-grow: 1;
+        }
+
+        /* Structural columns for "X" symbols */
+        .side-x {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 52vh; /* Matches the dynamic height of the list exactly */
+        }
+
+        /* SCALED UP: The pixel X shape grid */
+        .pixel-x {
+            display: grid;
+            /* Increased pixel size from 1.1vh to 2.2vh for much bigger crosses */
+            grid-template-columns: repeat(5, 2.2vh);
+            grid-template-rows: repeat(5, 2.2vh);
+            gap: 1.5px;
+        }
+
+        .pixel-x div { background-color: transparent; }
+        .pixel-x .p { background-color: var(--gold-color); }
+
+        .pixel-x-hidden .p {
+            background-color: var(--bg-color);
+        }
+
+        /* options list container */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 52vh; 
+            font-size: 5vh;
+            padding: 0 1vw;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 6vh 1fr auto;
+            align-items: center;
+        }
+
+        .rank {
+            text-align: left;
+        }
+
+        .name {
+            text-transform: uppercase;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 30px;
+            padding-right: 20px;
+        }
+
+        .points {
+            text-align: right;
+        }
+
+        /* Footer total sum section */
+        .footer-sum {
+            width: 100%;
+            text-align: right;
+            padding-right: 14vw; 
+            font-size: 3.5vh;
+            margin-bottom: 2vh;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <audio controls id="correct-audio" class="hidden-audio-player">
+        <source src="{% static 'audio/correct.mp3' %}">
+    </audio>
+    <audio controls id="wrong-audio" class="hidden-audio-player">
+        <source src="{% static 'audio/wrong.mp3' %}">
+    </audio>
+
+    <div class="pointsboard-container">
+        <div class="header-points" id="header-points">00</div>
+
+        <div class="main-layout">
+            <div class="side-x" id="left-x">
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+            </div>
+
+            <div class="options-list" id="list">
+                ...
+            </div>
+
+            <div class="side-x" id="right-x">
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-sum">Suma <span id="total-points-counter">00</span></div>
+    </div>
+    <script>
+        function xState(mistakes) {
+            if(mistakes == 0){
+                return `
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+            </div>`
+            } else if (mistakes == 1) {
+                return `
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>`
+            } else if(mistakes == 2){
+                return `
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="pixel-x">
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div></div><div></div><div class="p"></div><div></div><div></div>
+                    <div></div><div class="p"></div><div></div><div class="p"></div><div></div>
+                    <div class="p"></div><div></div><div></div><div></div><div class="p"></div>
+                </div>
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>`
+            } else if(mistakes == 3){
+                return `
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div class="pixel-x">
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                    <div></div><div></div><div></div><div></div><div></div>
+                </div>
+                `
+            }
+        };
+        
+        const correctAudio = document.getElementById("correct-audio");
+        const wrongAudio = document.getElementById("wrong-audio");
+
+        const reconnectDelay = 3000;
+        let socket;
+
+        let lastPoll = -1;
+        let lastMistakes = -1;
+
+        function connectSocket(){
+            const wsScheme = window.location.protocol === "https" ? "wss" : "ws";
+            socket = new WebSocket(`${wsScheme}://${window.location.host}/ws/scoreboard/`);
+
+            socket.onopen = function(){
+                console.log("Succesfully (re)connected!");
+            };
+
+            socket.onmessage = function(e){
+                data = JSON.parse(e.data);
+
+                console.log(data.question);
+
+                const headerPoints = document.getElementById("header-points");
+                if(data.poll) {
+                    if(data.poll > lastPoll && lastPoll != -1){
+                        correctAudio.play();
+                    }
+                    lastPoll = data.poll;
+                    headerPoints.innerText = data.poll >= 0 ? data.poll : "0" + data.poll;
+                }else{
+                    headerPoints.innerHTML = '00';
+                    lastPoll = 0;
+                }
+
+                const totalPointsCounter = document.getElementById("total-points-counter");
+                if(data.total_points) {
+                    totalPointsCounter.innerText = data.total_points >= 0 ? data.total_points : "0" + data.total_points;
+                }else{
+                    WebTransportDatagramDuplexStream.innerHTML = '00';
+                }
+
+                const leftX = document.getElementById("left-x");
+                leftX.innerHTML = xState(data.left_team_mistakes);
+
+                const rightX = document.getElementById("right-x");
+                rightX.innerHTML = xState(data.right_team_mistakes);
+
+                if(data.left_team_mistakes + data.right_team_mistakes > lastMistakes && lastMistakes != -1) {
+                    wrongAudio.play();
+                }
+                lastMistakes = data.left_team_mistakes + data.right_team_mistakes;
+
+                const list = document.getElementById('list');
+                list.innerHTML = "";
+                if(data.options){
+                    data.options.forEach((option, index) => {
+                        const row = document.createElement('div');
+                        row.classList.add('row');
+                        row.innerHTML = `
+                            <span class="rank">${index + 1}</span>
+                            <span class="name">${option.text}</span>
+                            <span class="points">${option.points >= 10 ? option.points : "0" + option.points}</span>
+                        `
+
+                        list.appendChild(row);
+                    });
+                } else {
+                    list.innerHTML = "...";
+                }
+            };
+
+            socket.onclose = function(e){
+                console.warn("Socket closed. Attempting to reconnect...", e.reason);
+                socket = null;
+                setTimeout(connectSocket, reconnectDelay);
+            };
+
+            socket.onerror = function(e){
+                console.error("Socket error: ", e.message);
+                socket.close();
+            }
+        };
+        connectSocket();
+    </script>
+</body>
+</html>
