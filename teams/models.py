@@ -10,8 +10,8 @@ class TeamsState(models.Model):
         TWO = 2, "2"
         THREE = 3, "3"
         
-    left_team_name = models.CharField(blank=True)
-    right_team_name = models.CharField(blank=True)
+    left_team_name = models.CharField(blank=True, max_length=128)
+    right_team_name = models.CharField(blank=True, max_length=128)
     
     left_team_mistakes = models.IntegerField(choices=MistakesCountChoices.choices, blank=False, default=MistakesCountChoices.ZERO)
     right_team_mistakes = models.IntegerField(choices=MistakesCountChoices.choices, blank=False, default=MistakesCountChoices.ZERO)

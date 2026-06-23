@@ -7,7 +7,7 @@ class Question(models.Model):
         TWO = 2, "2"
         THREE = 3, "3"
     
-    text = models.CharField(blank=False)
+    text = models.CharField(blank=False, max_length=128)
     is_active = models.BooleanField(default=False, blank=False)
     multiplier = models.IntegerField(choices=MultiplierChoices.choices, blank=False, default=MultiplierChoices.ONE)
     
@@ -23,7 +23,7 @@ class Question(models.Model):
         return f"{self.text}"
     
 class Option(models.Model):
-    text = models.CharField(blank=False)
+    text = models.CharField(blank=False, max_length=128)
     points = models.IntegerField(blank=False, validators=[MinValueValidator(1), MaxValueValidator(100)])
     hidden = models.BooleanField(blank=False, default=True)
     
