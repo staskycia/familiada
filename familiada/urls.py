@@ -22,3 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('scoreboard/', include("scoreboard.urls"))
 ]
+
+admin.site.site_header = "SALA XXX"
